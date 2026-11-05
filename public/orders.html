@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Orders | Motor Apparel Shop</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/nav.js" defer></script>
+    <script src="/js/orders.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">Jmotor <span>Apparel</span></a>
+      <nav id="account-links" class="account-links" aria-label="Account"></nav>
+    </header>
+
+    <main class="order-page">
+      <div class="order-page-heading">
+        <p class="eyebrow">Your account</p>
+        <h1>My orders</h1>
+      </div>
+
+      <p id="new-order-banner" class="success-banner" hidden></p>
+      <p id="orders-message" class="page-message" role="status" aria-live="polite"></p>
+      <div class="orders-layout">
+        <section aria-label="Order history">
+          <div id="orders-list" class="orders-list"></div>
+        </section>
+        <section id="order-detail" class="order-detail" aria-live="polite" hidden></section>
+      </div>
+    </main>
+  </body>
+</html>

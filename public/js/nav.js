@@ -28,13 +28,17 @@ async function loadAccountNavigation() {
       cartLink.href = '/cart.html';
       cartLink.textContent = 'Cart';
 
+      const ordersLink = document.createElement('a');
+      ordersLink.href = '/orders.html';
+      ordersLink.textContent = 'My orders';
+
       const logoutButton = document.createElement('button');
       logoutButton.type = 'button';
       logoutButton.className = 'nav-button';
       logoutButton.textContent = 'Logout';
       logoutButton.addEventListener('click', logout);
 
-      accountLinks.append(cartLink, greeting, logoutButton);
+      accountLinks.append(cartLink, ordersLink, greeting, logoutButton);
       return;
     }
 

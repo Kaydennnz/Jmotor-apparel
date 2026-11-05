@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Checkout | Motor Apparel Shop</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/nav.js" defer></script>
+    <script src="/js/checkout.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">Jmotor <span>Apparel</span></a>
+      <nav id="account-links" class="account-links" aria-label="Account"></nav>
+    </header>
+
+    <main class="order-page">
+      <div class="order-page-heading">
+        <p class="eyebrow">Almost there</p>
+        <h1>Checkout</h1>
+      </div>
+
+      <p id="checkout-message" class="page-message" role="status" aria-live="polite"></p>
+      <section id="empty-cart" class="empty-message" hidden>
+        <p>Your cart is empty.</p>
+        <a href="/index.html">Continue shopping</a>
+      </section>
+
+      <div id="checkout-content" class="checkout-layout" hidden>
+        <section class="checkout-section">
+          <h2>Shipping address</h2>
+          <div id="saved-address" class="saved-address" hidden></div>
+          <button id="edit-address" class="secondary-button address-edit-button" type="button" hidden>Edit address</button>
+
+          <form id="checkout-form">
+            <div id="address-fields" class="address-fields">
+              <label for="recipient-name">Recipient name</label>
+              <input id="recipient-name" name="recipientName" type="text" maxlength="100" required>
+
+              <label for="recipient-phone">Phone number</label>
+              <input id="recipient-phone" name="phone" type="tel" inputmode="numeric"
+                     pattern="09[0-9]{9}" maxlength="11" placeholder="09XXXXXXXXX" required>
+
+              <label for="street">Street address</label>
+              <input id="street" name="street" type="text" maxlength="255" required>
+
+              <label for="barangay">Barangay</label>
+              <input id="barangay" name="barangay" type="text" maxlength="100" required>
+
+              <label for="city">City</label>
+              <input id="city" name="city" type="text" maxlength="100" required>
+
+              <label for="province">Province</label>
+              <input id="province" name="province" type="text" maxlength="100" required>
+
+              <label for="postal-code">Postal code</label>
+              <input id="postal-code" name="postalCode" type="text" maxlength="20" required>
+            </div>
+
+            <fieldset class="payment-methods">
+              <legend>Payment method</legend>
+              <label><input type="radio" name="paymentMethod" value="cod" required> Cash on delivery</label>
+              <label><input type="radio" name="paymentMethod" value="gcash"> GCash</label>
+              <label><input type="radio" name="paymentMethod" value="bank transfer"> Bank transfer</label>
+
+              <div id="reference-field" hidden>
+                <label for="reference-number">Reference number</label>
+                <input id="reference-number" name="referenceNumber" type="text" maxlength="255">
+              </div>
+            </fieldset>
+
+            <button id="place-order" class="add-button" type="submit">Place order</button>
+          </form>
+        </section>
+
+        <section class="checkout-section" aria-labelledby="summary-title">
+          <h2 id="summary-title">Order summary</h2>
+          <div id="checkout-items" class="checkout-items"></div>
+          <p class="checkout-total">Total <strong id="checkout-total"></strong></p>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
