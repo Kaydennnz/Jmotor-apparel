@@ -3,10 +3,59 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Motorcycle apparel and accessories for every ride.">
     <title>Motor Apparel Shop</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/app.js" defer></script>
   </head>
   <body>
-    <h1>Motor Apparel Shop</h1>
-    <p>Welcome to the shop.</p>
+    <header class="topbar">
+      <a class="brand" href="/">Jmotor <span>Apparel</span></a>
+      <nav class="account-links" aria-label="Account">
+        <a href="#" aria-label="Login placeholder">Login</a>
+        <a href="#" aria-label="Cart placeholder">Cart</a>
+      </nav>
+    </header>
+
+    <main class="store">
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">Gear up and ride</p>
+        <h1 id="page-title">Made for the ride.</h1>
+        <p>Browse motorcycle apparel and essentials from Jmotor.</p>
+      </section>
+
+      <section aria-labelledby="categories-title">
+        <h2 id="categories-title" class="section-title">Shop by category</h2>
+        <div id="category-filters" class="category-filters" aria-label="Product categories"></div>
+      </section>
+
+      <section aria-labelledby="products-title">
+        <div class="section-heading">
+          <h2 id="products-title" class="section-title">Shop all gear</h2>
+          <p id="product-count" class="product-count" aria-live="polite"></p>
+        </div>
+        <div id="product-grid" class="product-grid" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <dialog id="product-dialog" class="product-dialog" aria-labelledby="detail-name">
+      <button id="close-dialog" class="close-button" type="button" aria-label="Close product details">Close</button>
+      <p id="detail-category" class="eyebrow"></p>
+      <h2 id="detail-name"></h2>
+      <p id="detail-description" class="detail-description"></p>
+      <div class="variant-pickers">
+        <label for="size-picker">Size</label>
+        <select id="size-picker"></select>
+        <label for="color-picker">Color</label>
+        <select id="color-picker"></select>
+      </div>
+      <p id="variant-price" class="variant-price"></p>
+      <p id="variant-stock" class="variant-stock" aria-live="polite"></p>
+      <button id="add-to-cart" class="add-button" type="button">Add to cart</button>
+    </dialog>
+
+    <footer class="footer">
+      <p>Jmotor Apparel</p>
+    </footer>
   </body>
 </html>

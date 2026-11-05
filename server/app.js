@@ -5,6 +5,7 @@ const session = require('express-session');
 const path = require('path');
 const pool = require('./db');
 const authRoutes = require('./routes/auth');
+const catalogRoutes = require('./routes/catalog');
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(session({
   },
 }));
 app.use('/api/auth', authRoutes);
+app.use('/api', catalogRoutes);
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.get('/api/health', async (req, res, next) => {
