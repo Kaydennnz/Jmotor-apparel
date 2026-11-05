@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Register | Motor Apparel Shop</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/nav.js" defer></script>
+    <script src="/js/register.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">Jmotor <span>Apparel</span></a>
+      <nav id="account-links" class="account-links" aria-label="Account"></nav>
+    </header>
+
+    <main class="auth-page">
+      <section class="auth-card" aria-labelledby="register-title">
+        <p class="eyebrow">Join the ride</p>
+        <h1 id="register-title">Create your account</h1>
+        <p class="auth-intro">Verify your phone number to get started.</p>
+
+        <form id="phone-form" class="register-step">
+          <p class="step-label">Step 1 of 3 · Phone number</p>
+          <label for="register-phone">Philippine mobile number</label>
+          <input id="register-phone" name="phone" type="tel" inputmode="numeric"
+                 autocomplete="tel" pattern="09[0-9]{9}" maxlength="11"
+                 placeholder="09XXXXXXXXX" required>
+
+          <p id="phone-message" class="form-message" role="status" aria-live="polite"></p>
+          <button id="request-code-submit" class="add-button" type="submit">Send verification code</button>
+        </form>
+
+        <p id="demo-code" class="demo-code" role="status" hidden></p>
+
+        <form id="code-form" class="register-step" hidden>
+          <p class="step-label">Step 2 of 3 · Verify phone</p>
+          <label for="register-code">Six-digit verification code</label>
+          <input id="register-code" name="code" type="text" inputmode="numeric"
+                 autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6"
+                 placeholder="000000" required>
+
+          <p id="code-message" class="form-message" role="status" aria-live="polite"></p>
+          <button id="verify-code-submit" class="add-button" type="submit">Verify code</button>
+          <button id="change-phone" class="secondary-button" type="button">Change phone or request a new code</button>
+        </form>
+
+        <form id="details-form" class="register-step" hidden>
+          <p class="step-label">Step 3 of 3 · Account details</p>
+          <label for="register-name">Display name</label>
+          <input id="register-name" name="displayName" type="text"
+                 autocomplete="name" maxlength="100" required>
+
+          <label for="register-password">Password</label>
+          <input id="register-password" name="password" type="password"
+                 autocomplete="new-password" minlength="8" required>
+
+          <label for="confirm-password">Confirm password</label>
+          <input id="confirm-password" name="confirmPassword" type="password"
+                 autocomplete="new-password" required>
+
+          <p id="details-message" class="form-message" role="status" aria-live="polite"></p>
+          <button id="register-submit" class="add-button" type="submit">Create account</button>
+        </form>
+
+        <p class="auth-switch">Already have an account? <a href="/login.html">Login</a></p>
+      </section>
+    </main>
+  </body>
+</html>

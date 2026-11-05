@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login | Motor Apparel Shop</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/nav.js" defer></script>
+    <script src="/js/login.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">Jmotor <span>Apparel</span></a>
+      <nav id="account-links" class="account-links" aria-label="Account"></nav>
+    </header>
+
+    <main class="auth-page">
+      <section class="auth-card" aria-labelledby="login-title">
+        <p class="eyebrow">Welcome back</p>
+        <h1 id="login-title">Login</h1>
+        <p class="auth-intro">Sign in to your Jmotor account.</p>
+
+        <form id="login-form">
+          <label for="login-phone">Phone number</label>
+          <input id="login-phone" name="phone" type="tel" inputmode="numeric"
+                 autocomplete="tel" pattern="09[0-9]{9}" maxlength="11"
+                 placeholder="09XXXXXXXXX" required>
+
+          <label for="login-password">Password</label>
+          <input id="login-password" name="password" type="password"
+                 autocomplete="current-password" required>
+
+          <p id="login-message" class="form-message" role="status" aria-live="polite"></p>
+          <button id="login-submit" class="add-button" type="submit">Login</button>
+        </form>
+
+        <p class="auth-switch">New here? <a href="/register.html">Create an account</a></p>
+      </section>
+    </main>
+  </body>
+</html>
