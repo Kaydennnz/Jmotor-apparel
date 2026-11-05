@@ -1,0 +1,34 @@
+{
+  "name": "jmotor-apparel",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server/app.js",
+    "dev": "nodemon server/app.js",
+    "setup": "node server/setup.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kaydennnz/Jmotor-apparel.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Kaydennnz/Jmotor-apparel/issues"
+  },
+  "homepage": "https://github.com/Kaydennnz/Jmotor-apparel#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^16.4.7",
+    "express": "^5.3.0",
+    "express-session": "^1.19.0",
+    "mysql2": "^3.24.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
