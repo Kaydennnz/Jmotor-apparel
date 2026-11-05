@@ -24,13 +24,17 @@ async function loadAccountNavigation() {
       greeting.className = 'account-greeting';
       greeting.textContent = `Hi, ${user.displayName}`;
 
+      const cartLink = document.createElement('a');
+      cartLink.href = '/cart.html';
+      cartLink.textContent = 'Cart';
+
       const logoutButton = document.createElement('button');
       logoutButton.type = 'button';
       logoutButton.className = 'nav-button';
       logoutButton.textContent = 'Logout';
       logoutButton.addEventListener('click', logout);
 
-      accountLinks.append(greeting, logoutButton);
+      accountLinks.append(cartLink, greeting, logoutButton);
       return;
     }
 

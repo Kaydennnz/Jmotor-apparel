@@ -7,6 +7,9 @@ const sizePicker = document.getElementById('size-picker');
 const colorPicker = document.getElementById('color-picker');
 const variantPrice = document.getElementById('variant-price');
 const variantStock = document.getElementById('variant-stock');
+const detailQuantity = document.getElementById('detail-quantity');
+const cartMessage = document.getElementById('cart-message');
+const addToCartButton = document.getElementById('add-to-cart');
 const defaultVariantValue = '__default_variant__';
 const pickerPlaceholder = '__select_variant__';
 
@@ -130,6 +133,8 @@ async function showProduct(productId) {
   document.getElementById('detail-description').textContent = product.description || '';
 
   currentVariants = product.variants;
+  detailQuantity.value = '1';
+  cartMessage.textContent = '';
   fillPicker(sizePicker, getUniqueValues(currentVariants, 'size'), 'Select a size');
   fillPicker(colorPicker, getUniqueValues(currentVariants, 'color'), 'Select a color');
 
@@ -200,10 +205,8 @@ function updatePickerOptions(picker, key) {
 
 // Show the exact price and stock for the selected variant.
 function updateVariantDetails() {
-  const variant = currentVariants.find((item) => (
-    pickerValue(item.size) === sizePicker.value
-    && pickerValue(item.color) === colorPicker.value
-  ));
+  const variant = getSelectedVariant();
+  addToCartButton.disabled = !variant || variant.stock === 0;
 
   variantPrice.textContent = variant ? formatPrice(variant.price) : '';
   variantStock.classList.remove('out-of-stock');
@@ -215,6 +218,57 @@ function updateVariantDetails() {
     variantStock.classList.add('out-of-stock');
   } else {
     variantStock.textContent = `${variant.stock} in stock`;
+  }
+}
+
+// Find the variant selected in both option pickers.
+function getSelectedVariant() {
+  return currentVariants.find((item) => (
+    pickerValue(item.size) === sizePicker.value
+    && pickerValue(item.color) === colorPicker.value
+  ));
+}
+
+// Add the selected variant and quantity to the signed-in user's cart.
+async function addToCart() {
+  const variant = getSelectedVariant();
+  const quantity = Number(detailQuantity.value);
+
+  if (!variant) {
+    cartMessage.textContent = 'Choose a size and color first.';
+    return;
+  }
+
+  if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
+    cartMessage.textContent = 'Quantity must be a whole number from 1 to 99.';
+    return;
+  }
+
+  addToCartButton.disabled = true;
+  cartMessage.textContent = '';
+  try {
+    const response = await fetch('/api/cart/items', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ variantId: variant.id, quantity }),
+    });
+    const result = await response.json();
+
+    if (response.status === 401) {
+      window.location.assign('/login.html');
+      return;
+    }
+
+    if (!response.ok) {
+      cartMessage.textContent = result.error || result.message || 'Could not add this item to your cart.';
+      return;
+    }
+
+    cartMessage.textContent = 'Added to cart';
+  } catch (error) {
+    cartMessage.textContent = 'Could not reach the server. Please try again.';
+  } finally {
+    addToCartButton.disabled = !variant || variant.stock === 0;
   }
 }
 
@@ -239,6 +293,7 @@ colorPicker.addEventListener('change', () => {
 });
 
 closeDialog.addEventListener('click', () => productDialog.close());
+addToCartButton.addEventListener('click', addToCart);
 
 loadCategories()
   .then(loadProducts)

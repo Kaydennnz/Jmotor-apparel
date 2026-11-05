@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Your Cart | Motor Apparel Shop</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/nav.js" defer></script>
+    <script src="/js/cart.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">Jmotor <span>Apparel</span></a>
+      <nav id="account-links" class="account-links" aria-label="Account"></nav>
+    </header>
+
+    <main class="cart-page">
+      <div class="cart-heading">
+        <div>
+          <p class="eyebrow">Your selection</p>
+          <h1>Your cart</h1>
+        </div>
+        <a class="continue-shopping" href="/index.html">Continue shopping</a>
+      </div>
+
+      <p id="cart-message" class="cart-page-message" role="status" aria-live="polite"></p>
+      <div id="cart-items" class="cart-items" aria-live="polite"></div>
+
+      <section id="cart-summary" class="cart-summary" hidden>
+        <p class="cart-total-label">Cart total <strong id="cart-total"></strong></p>
+        <a class="checkout-button" href="/checkout.html">Proceed to checkout</a>
+      </section>
+    </main>
+  </body>
+</html>
