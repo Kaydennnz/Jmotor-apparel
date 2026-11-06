@@ -36,6 +36,10 @@ async function loadAccountNavigation() {
       staffLink.href = '/staff.html';
       staffLink.textContent = 'Staff';
 
+      const adminLink = document.createElement('a');
+      adminLink.href = '/admin.html';
+      adminLink.textContent = 'Admin';
+
       const logoutButton = document.createElement('button');
       logoutButton.type = 'button';
       logoutButton.className = 'nav-button';
@@ -43,10 +47,12 @@ async function loadAccountNavigation() {
       logoutButton.addEventListener('click', logout);
 
       if (user.role === 'staff' || user.role === 'admin') {
-        accountLinks.append(cartLink, ordersLink, staffLink, greeting, logoutButton);
-      } else {
-        accountLinks.append(cartLink, ordersLink, greeting, logoutButton);
+        accountLinks.append(cartLink, ordersLink, staffLink);
       }
+      if (user.role === 'admin') {
+        accountLinks.append(adminLink);
+      }
+      accountLinks.append(greeting, logoutButton);
       return;
     }
 

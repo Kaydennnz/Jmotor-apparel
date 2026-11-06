@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin | Motor Apparel Shop</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/nav.js" defer></script>
+    <script src="/js/admin.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">Jmotor <span>Apparel</span></a>
+      <nav id="account-links" class="account-links" aria-label="Account"></nav>
+    </header>
+
+    <main class="admin-page">
+      <div class="order-page-heading">
+        <p class="eyebrow">Store management</p>
+        <h1>Admin</h1>
+      </div>
+      <p id="admin-message" class="page-message" role="status" aria-live="polite"></p>
+      <div id="admin-app" hidden>
+        <div class="admin-tabs" role="tablist" aria-label="Admin sections">
+          <button id="tab-products" class="admin-tab is-active" type="button"
+                  role="tab" aria-selected="true" aria-controls="panel-products">Products</button>
+          <button id="tab-staff" class="admin-tab" type="button"
+                  role="tab" aria-selected="false" aria-controls="panel-staff">Staff</button>
+          <button id="tab-reports" class="admin-tab" type="button"
+                  role="tab" aria-selected="false" aria-controls="panel-reports">Reports</button>
+        </div>
+
+        <section id="panel-products" class="admin-panel" role="tabpanel"
+                 aria-labelledby="tab-products">
+          <div class="admin-panel-heading">
+            <h2>Products</h2>
+            <button id="add-product-button" class="add-button admin-action-button" type="button">
+              Add product
+            </button>
+          </div>
+          <div id="admin-products" class="admin-product-list"></div>
+        </section>
+
+        <section id="panel-staff" class="admin-panel" role="tabpanel"
+                 aria-labelledby="tab-staff" hidden>
+          <section class="admin-card">
+            <h2>Staff accounts</h2>
+            <div id="admin-staff-list" class="admin-staff-list"></div>
+          </section>
+          <section class="admin-card">
+            <h2>Create staff account</h2>
+            <form id="staff-form" class="admin-form">
+              <div class="admin-form-grid">
+                <div>
+                  <label for="staff-name">Display name</label>
+                  <input id="staff-name" name="displayName" type="text" maxlength="100" required>
+                </div>
+                <div>
+                  <label for="staff-phone">Phone number</label>
+                  <input id="staff-phone" name="phone" type="tel" inputmode="numeric"
+                         pattern="09[0-9]{9}" maxlength="11" placeholder="09XXXXXXXXX" required>
+                </div>
+                <div>
+                  <label for="staff-password">Password</label>
+                  <input id="staff-password" name="password" type="password"
+                         minlength="8" autocomplete="new-password" required>
+                </div>
+              </div>
+              <button class="add-button admin-action-button" type="submit">Create staff</button>
+            </form>
+          </section>
+        </section>
+
+        <section id="panel-reports" class="admin-panel" role="tabpanel"
+                 aria-labelledby="tab-reports" hidden>
+          <div id="admin-reports"></div>
+        </section>
+      </div>
+    </main>
+
+    <dialog id="product-dialog" class="admin-dialog">
+      <form id="product-form" class="admin-form">
+        <div class="admin-dialog-heading">
+          <h2 id="product-dialog-title">Add product</h2>
+          <button class="admin-dialog-close" type="button" data-close-dialog aria-label="Close">×</button>
+        </div>
+        <label for="product-name">Name</label>
+        <input id="product-name" name="name" type="text" maxlength="150" required>
+        <label for="product-description">Description</label>
+        <textarea id="product-description" name="description" rows="3"></textarea>
+        <label for="product-category">Category</label>
+        <select id="product-category" name="categoryId" required></select>
+        <div id="active-field" class="admin-active-field" hidden>
+          <input id="product-active" name="active" type="checkbox">
+          <label for="product-active">Active</label>
+        </div>
+        <div id="new-variants-field">
+          <div class="admin-panel-heading">
+            <h3>Variants</h3>
+            <button id="add-variant-row" class="secondary-button admin-inline-button" type="button">
+              Add variant row
+            </button>
+          </div>
+          <div id="new-variant-rows" class="admin-variant-rows"></div>
+        </div>
+        <p class="admin-form-error" aria-live="polite"></p>
+        <div class="admin-dialog-actions">
+          <button class="secondary-button admin-inline-button" type="button" data-close-dialog>Close</button>
+          <button class="add-button admin-inline-button" type="submit">Save</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="variant-dialog" class="admin-dialog">
+      <form id="variant-form" class="admin-form">
+        <div class="admin-dialog-heading">
+          <h2 id="variant-dialog-title">Add variant</h2>
+          <button class="admin-dialog-close" type="button" data-close-dialog aria-label="Close">×</button>
+        </div>
+        <label for="variant-size">Size</label>
+        <input id="variant-size" name="size" type="text" maxlength="30">
+        <label for="variant-color">Color</label>
+        <input id="variant-color" name="color" type="text" maxlength="50">
+        <div class="admin-form-grid">
+          <div>
+            <label for="variant-price">Price (whole number)</label>
+            <input id="variant-price" name="price" type="number" min="1" step="1" required>
+          </div>
+          <div>
+            <label for="variant-stock">Stock</label>
+            <input id="variant-stock" name="stock" type="number" min="0" step="1" required>
+          </div>
+        </div>
+        <p class="admin-form-error" aria-live="polite"></p>
+        <div class="admin-dialog-actions">
+          <button class="secondary-button admin-inline-button" type="button" data-close-dialog>Close</button>
+          <button class="add-button admin-inline-button" type="submit">Save</button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>
