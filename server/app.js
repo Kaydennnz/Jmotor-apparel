@@ -9,6 +9,7 @@ const catalogRoutes = require('./routes/catalog');
 const cartRoutes = require('./routes/cart');
 const ordersRoutes = require('./routes/orders');
 const staffRoutes = require('./routes/staff');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 
@@ -45,6 +46,7 @@ app.get('/api/health', async (req, res, next) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api', catalogRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api', ordersRoutes);
