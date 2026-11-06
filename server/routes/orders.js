@@ -10,8 +10,6 @@ const paymentMethods = new Map([
   ['bank_transfer', 'bank_transfer'],
 ]);
 
-router.use(requireLogin);
-
 // Create an HTTP error that the route can return after rolling back.
 function httpError(status, message) {
   const error = new Error(message);
@@ -394,10 +392,10 @@ async function cancelOrder(req, res) {
   }
 }
 
-router.get('/address', getAddress);
-router.post('/checkout', checkout);
-router.get('/orders', getOrders);
-router.get('/orders/:id', getOrder);
-router.post('/orders/:id/cancel', cancelOrder);
+router.get('/address', requireLogin, getAddress);
+router.post('/checkout', requireLogin, checkout);
+router.get('/orders', requireLogin, getOrders);
+router.get('/orders/:id', requireLogin, getOrder);
+router.post('/orders/:id/cancel', requireLogin, cancelOrder);
 
 module.exports = router;

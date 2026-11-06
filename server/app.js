@@ -23,12 +23,6 @@ app.use(session({
     maxAge: 24 * 60 * 60 * 1000,
   },
 }));
-app.use('/api/auth', authRoutes);
-app.use('/api', catalogRoutes);
-app.use('/api/cart', cartRoutes);
-app.use('/api', ordersRoutes);
-app.use('/api/staff', staffRoutes);
-app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.get('/api/health', async (req, res, next) => {
   try {
@@ -49,6 +43,13 @@ app.get('/api/health', async (req, res, next) => {
     });
   }
 });
+
+app.use('/api/auth', authRoutes);
+app.use('/api', catalogRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api', ordersRoutes);
+app.use('/api/staff', staffRoutes);
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Return application errors as JSON.
 app.use((error, req, res, next) => {
