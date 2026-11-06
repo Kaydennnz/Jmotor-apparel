@@ -8,6 +8,7 @@ const authRoutes = require('./routes/auth');
 const catalogRoutes = require('./routes/catalog');
 const cartRoutes = require('./routes/cart');
 const ordersRoutes = require('./routes/orders');
+const staffRoutes = require('./routes/staff');
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api', catalogRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api', ordersRoutes);
+app.use('/api/staff', staffRoutes);
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.get('/api/health', async (req, res, next) => {

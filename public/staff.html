@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Staff | Motor Apparel Shop</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/nav.js" defer></script>
+    <script src="/js/staff.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">Jmotor <span>Apparel</span></a>
+      <nav id="account-links" class="account-links" aria-label="Account"></nav>
+    </header>
+
+    <main class="staff-page">
+      <div class="order-page-heading">
+        <p class="eyebrow">Store operations</p>
+        <h1>Staff orders</h1>
+      </div>
+
+      <p id="staff-message" class="page-message" role="status" aria-live="polite"></p>
+      <div id="staff-app" hidden>
+        <section class="staff-section" aria-labelledby="staff-orders-heading">
+          <div class="staff-section-heading">
+            <h2 id="staff-orders-heading">Orders</h2>
+            <label for="order-status-filter">Filter by status</label>
+            <select id="order-status-filter">
+              <option value="">All</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="packed">Packed</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="staff-table-scroll">
+            <table class="staff-orders-table">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Customer</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Total</th>
+                  <th scope="col">Payment method</th>
+                  <th scope="col">Payment status</th>
+                </tr>
+              </thead>
+              <tbody id="staff-orders-list"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="staff-order-detail" class="staff-section staff-order-detail"
+                 aria-live="polite" hidden></section>
+
+        <section class="staff-section" aria-labelledby="staff-stock-heading">
+          <h2 id="staff-stock-heading">Update stock</h2>
+          <form id="staff-stock-form" class="staff-stock-form">
+            <div>
+              <label for="variant-id">Variant ID</label>
+              <input id="variant-id" name="variantId" type="number" min="1" step="1" required>
+            </div>
+            <div>
+              <label for="variant-stock">New stock</label>
+              <input id="variant-stock" name="stock" type="number" min="0" step="1" required>
+            </div>
+            <button class="add-button" type="submit">Update stock</button>
+          </form>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
