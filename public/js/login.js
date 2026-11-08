@@ -25,7 +25,7 @@ async function submitLogin(event) {
       return;
     }
 
-    window.location.assign('/index.html');
+    window.location.assign(getValidatedNextPath());
   } catch (error) {
     loginMessage.textContent = 'Could not reach the server. Please try again.';
   } finally {

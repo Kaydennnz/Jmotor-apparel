@@ -100,7 +100,7 @@ async function registerAccount(event) {
       return;
     }
 
-    window.location.assign('/index.html');
+    window.location.assign(getValidatedNextPath());
   } catch (error) {
     detailsMessage.textContent = error.message;
   } finally {

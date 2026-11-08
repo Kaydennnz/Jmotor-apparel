@@ -1,6 +1,7 @@
 const categoryFilters = document.getElementById('category-filters');
 const productGrid = document.getElementById('product-grid');
 const productCount = document.getElementById('product-count');
+const productSearch = document.getElementById('product-search');
 const productDialog = document.getElementById('product-dialog');
 const closeDialog = document.getElementById('close-dialog');
 const sizePicker = document.getElementById('size-picker');
@@ -15,6 +16,8 @@ const pickerPlaceholder = '__select_variant__';
 
 let selectedCategory = '';
 let currentVariants = [];
+let loadedProducts = [];
+let searchTerm = '';
 
 // Format a price in Philippine pesos.
 function formatPrice(price) {
@@ -77,13 +80,25 @@ async function loadProducts() {
   }
 
   const products = await response.json();
+  loadedProducts = products;
+  renderProducts();
+}
+
+// Filter the products already loaded for the current category.
+function renderProducts() {
+  const search = searchTerm.trim().toLocaleLowerCase();
+  const products = loadedProducts.filter((product) => (
+    product.name.toLocaleLowerCase().includes(search)
+  ));
   productGrid.replaceChildren();
   productCount.textContent = `${products.length} ${products.length === 1 ? 'item' : 'items'}`;
 
   if (products.length === 0) {
     const emptyMessage = document.createElement('p');
     emptyMessage.className = 'empty-message';
-    emptyMessage.textContent = 'No products in this category yet.';
+    emptyMessage.textContent = search
+      ? 'No products match your search.'
+      : 'No products in this category yet.';
     productGrid.append(emptyMessage);
     return;
   }
@@ -255,7 +270,10 @@ async function addToCart() {
     const result = await response.json();
 
     if (response.status === 401) {
-      window.location.assign('/login.html');
+      cartMessage.textContent = 'Please log in to order';
+      await new Promise((resolve) => window.setTimeout(resolve, 900));
+      const next = `${window.location.pathname}${window.location.search}`;
+      window.location.assign(`/login.html?next=${encodeURIComponent(next)}`);
       return;
     }
 
@@ -294,6 +312,10 @@ colorPicker.addEventListener('change', () => {
 
 closeDialog.addEventListener('click', () => productDialog.close());
 addToCartButton.addEventListener('click', addToCart);
+productSearch.addEventListener('input', () => {
+  searchTerm = productSearch.value;
+  renderProducts();
+});
 
 loadCategories()
   .then(loadProducts)
