@@ -268,7 +268,9 @@ INSERT INTO product_variants (product_id, sku, size, color, price, stock) VALUES
     (10, 'JM-EG-RF-BLK-M', 'M', 'Black', 799.00, 24),
     (10, 'JM-EG-RF-BLK-L', 'L', 'Black', 799.00, 17);
 
--- Seed sticker products with one default variant each.
+-- Seed sticker products with Set and Pack variants.
 INSERT INTO product_variants (product_id, sku, size, color, price, stock) VALUES
-    (11, 'JM-ST-RN-DEFAULT', 'One Size', 'Default', 100.00, 30),
-    (12, 'JM-ST-MB-DEFAULT', 'One Size', 'Default', 200.00, 25);
+    (11, 'JM-ST-RN-DEFAULT', 'Set', 'Default', 100.00, 30),
+    (11, 'JM-ST-RN-DEFAULT-PACK', 'Pack', 'Default', 200.00, 30),
+    (12, 'JM-ST-MB-DEFAULT', 'Set', 'Default', 100.00, 25),
+    (12, 'JM-ST-MB-DEFAULT-PACK', 'Pack', 'Default', 200.00, 25);

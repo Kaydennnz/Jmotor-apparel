@@ -3,101 +3,126 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Staff | Motor Apparel Shop</title>
+    <title>Staff | Jmotor Apparel</title>
     <link rel="stylesheet" href="/css/style.css">
     <script src="/js/nav.js" defer></script>
     <script src="/js/staff.js" defer></script>
   </head>
-  <body>
-    <header class="topbar">
-      <a class="brand" href="/index.html">Jmotor Apparel</a>
-      <nav id="account-links" class="account-links" aria-label="Account"></nav>
-    </header>
+  <body class="admin-portal-body">
+    <div class="portal-layout">
+      <aside class="portal-sidebar">
+        <div class="portal-sidebar-heading">
+          <a class="portal-brand" href="/staff.html">Jmotor Apparel</a>
+          <span class="portal-brand-label">Staff portal</span>
+          <button class="portal-menu-toggle portal-sidebar-toggle" type="button"
+                  aria-label="Toggle menu" aria-expanded="true" aria-controls="staff-navigation">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+          </button>
+        </div>
+        <nav id="staff-navigation" class="portal-navigation" aria-label="Staff">
+          <a class="portal-nav-item" href="#orders">Orders</a>
+          <a class="portal-nav-item" href="#stock">Stock</a>
+          <a id="staff-admin-link" class="portal-nav-item" href="/admin.html" hidden>
+            Back to dashboard
+          </a>
+          <button class="portal-logout" type="button" data-staff-logout>Logout</button>
+        </nav>
+      </aside>
 
-    <main class="staff-page">
-      <div class="order-page-heading">
-        <p class="eyebrow">Store operations</p>
-        <h1>Staff orders</h1>
-      </div>
-
-      <p id="staff-message" class="page-message" role="status" aria-live="polite"></p>
-      <div id="staff-app" hidden>
-        <section class="staff-section" aria-labelledby="staff-orders-heading">
-          <div class="staff-section-heading">
-            <h2 id="staff-orders-heading">Orders</h2>
-            <label for="order-status-filter">Filter by status</label>
-            <select id="order-status-filter">
-              <option value="">All</option>
-              <option value="pending">Pending</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="packed">Packed</option>
-              <option value="shipped">Shipped</option>
-              <option value="delivered">Delivered</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
+      <main class="portal-main">
+        <button class="portal-menu-toggle portal-content-toggle" type="button" aria-label="Toggle menu"
+                aria-expanded="true" aria-controls="staff-navigation" hidden>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </button>
+        <header class="portal-page-heading">
+          <div id="staff-stock-heading">
+            <p class="portal-kicker">Store operations</p>
+            <h1 id="staff-portal-heading">Orders</h1>
           </div>
-          <div class="staff-table-scroll">
-            <table class="staff-orders-table">
-              <thead>
-                <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">Date</th>
-                  <th scope="col">Customer</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Total</th>
-                  <th scope="col">Payment method</th>
-                  <th scope="col">Payment status</th>
-                </tr>
-              </thead>
-              <tbody id="staff-orders-list"></tbody>
-            </table>
-          </div>
-        </section>
+        </header>
 
-        <section id="staff-order-detail" class="staff-section staff-order-detail"
-                 aria-live="polite" hidden></section>
+        <p id="staff-message" class="page-message portal-message" role="status" aria-live="polite"></p>
+        <div id="staff-app" class="portal-content" hidden>
+          <section id="staff-orders-panel" class="portal-section" data-section="orders"
+                   aria-labelledby="staff-orders-heading" hidden>
+            <section class="staff-section">
+              <div class="staff-section-heading">
+                <h2 id="staff-orders-heading">Orders</h2>
+                <label for="order-status-filter">Filter by status</label>
+                <select id="order-status-filter">
+                  <option value="">All</option>
+                  <option value="pending">Pending</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="packed">Packed</option>
+                  <option value="shipped">Shipped</option>
+                  <option value="delivered">Delivered</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+              <div class="staff-table-scroll">
+                <table class="staff-orders-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">ID</th>
+                      <th scope="col">Date</th>
+                      <th scope="col">Customer</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Total</th>
+                      <th scope="col">Payment method</th>
+                      <th scope="col">Payment status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="staff-orders-list"></tbody>
+                </table>
+              </div>
+            </section>
+            <section id="staff-order-detail" class="staff-section staff-order-detail"
+                     aria-live="polite" hidden></section>
+          </section>
 
-        <section class="staff-section" aria-labelledby="staff-stock-heading">
-          <h2 id="staff-stock-heading">Update stock</h2>
-          <form id="staff-stock-form" class="staff-stock-form">
-            <div>
-              <label for="variant-id">Variant ID</label>
-              <input id="variant-id" name="variantId" type="number" min="1" step="1" required>
+          <section id="staff-stock-panel" class="portal-section" data-section="stock"
+                   aria-labelledby="staff-stock-heading" hidden>
+            <div class="staff-stock-filters staff-stock-filters-compact">
+              <label>
+                <span>Search products</span>
+                <input id="staff-stock-search" type="search" autocomplete="off"
+                       placeholder="Search by product name">
+              </label>
+              <label>
+                <span>Category</span>
+                <select id="staff-stock-category">
+                  <option value="">All categories</option>
+                </select>
+              </label>
+              <label class="staff-low-stock-filter">
+                <input id="staff-low-stock-only" type="checkbox">
+                <span>Low stock only</span>
+              </label>
             </div>
-            <div>
-              <label for="variant-stock">New stock</label>
-              <input id="variant-stock" name="stock" type="number" min="0" step="1" required>
+            <p id="staff-stock-message" class="page-message portal-message"
+               role="status" aria-live="polite"></p>
+            <div class="portal-table-scroll staff-stock-table-scroll">
+              <table class="portal-data-table staff-stock-table staff-stock-table-polished">
+                <thead>
+                  <tr>
+                    <th scope="col">Product</th>
+                    <th scope="col">Size</th>
+                    <th scope="col">Color</th>
+                    <th scope="col">Current stock</th>
+                    <th scope="col">Add / remove</th>
+                    <th scope="col">Set exact count</th>
+                  </tr>
+                </thead>
+                <tbody id="staff-variants-list"></tbody>
+              </table>
             </div>
-            <button class="add-button" type="submit">Update stock</button>
-          </form>
-        </section>
-      </div>
-    </main>
-    <footer class="site-footer footer">
-      <div class="footer-columns">
-        <section>
-          <h2>Customer Service</h2>
-          <a class="footer-placeholder" href="#">FAQ</a>
-          <a class="footer-placeholder" href="#">Payment Methods</a>
-          <a class="footer-placeholder" href="#">Delivery</a>
-          <a class="footer-placeholder" href="#">Return Policy</a>
-          <a href="/orders.html">Track your order</a>
-        </section>
-        <section>
-          <h2>About Jmotor</h2>
-          <a class="footer-placeholder" href="#">About Us</a>
-          <a class="footer-placeholder" href="#">Join Us</a>
-          <a class="footer-placeholder" href="#">Privacy Policy</a>
-          <a class="footer-placeholder" href="#">Terms and Conditions</a>
-        </section>
-        <section>
-          <h2>Contacts</h2>
-          <p>Email: demo@jmotor.example</p>
-          <p>Phone: 0900 000 0000</p>
-          <p class="footer-note">(demo placeholders)</p>
-        </section>
-      </div>
-      <p class="footer-bottom">Jmotor Apparel - school project demo</p>
-    </footer>
+          </section>
+        </div>
+      </main>
+    </div>
   </body>
 </html>

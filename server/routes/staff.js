@@ -322,6 +322,59 @@ async function cancelOrder(req, res) {
   }
 }
 
+async function getVariants(req, res) {
+  const [variants] = await pool.execute(
+    `SELECT pv.id AS variantId, p.name AS productName, c.name AS categoryName,
+            pv.size, pv.color, pv.stock
+     FROM product_variants pv
+     JOIN products p ON p.id = pv.product_id
+     JOIN categories c ON c.id = p.category_id
+     WHERE p.is_active = ?
+     ORDER BY pv.stock, p.name, pv.id`,
+    [1]
+  );
+  res.json(variants.map((variant) => ({
+    ...variant,
+    variantId: Number(variant.variantId),
+    stock: Number(variant.stock),
+  })));
+}
+
+async function adjustVariantStock(req, res) {
+  const variantId = req.params.id;
+  const { delta } = req.body || {};
+  if (!/^[1-9]\d*$/.test(variantId)) {
+    return res.status(404).json({ error: 'Product variant not found' });
+  }
+  if (!Number.isInteger(delta) || delta === 0 || delta < -1000 || delta > 1000) {
+    return res.status(400).json({ error: 'Delta must be a non-zero integer between -1000 and 1000' });
+  }
+
+  const [result] = await pool.execute(
+    'UPDATE product_variants SET stock = stock + ? WHERE id = ? AND stock + ? >= 0',
+    [delta, variantId, delta]
+  );
+  if (result.affectedRows === 0) {
+    const [variants] = await pool.execute(
+      'SELECT id FROM product_variants WHERE id = ? LIMIT 1',
+      [variantId]
+    );
+    if (variants.length === 0) {
+      return res.status(404).json({ error: 'Product variant not found' });
+    }
+    return res.status(400).json({ error: 'Stock cannot go below 0' });
+  }
+
+  const [variants] = await pool.execute(
+    'SELECT stock FROM product_variants WHERE id = ? LIMIT 1',
+    [variantId]
+  );
+  if (variants.length === 0) {
+    return res.status(404).json({ error: 'Product variant not found' });
+  }
+  res.json({ message: 'Stock adjusted', stock: Number(variants[0].stock) });
+}
+
 // Set inventory without allowing price changes.
 async function updateVariantStock(req, res) {
   const variantId = req.params.id;
@@ -356,6 +409,8 @@ router.get('/orders/:id', getOrder);
 router.post('/orders/:id/status', updateOrderStatus);
 router.post('/orders/:id/mark-paid', markPaid);
 router.post('/orders/:id/cancel', cancelOrder);
+router.get('/variants', getVariants);
+router.post('/variants/:id/stock-adjust', adjustVariantStock);
 router.patch('/variants/:id/stock', updateVariantStock);
 
 module.exports = router;

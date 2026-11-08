@@ -160,6 +160,8 @@ async function logout(event) {
   }
 }
 
+window.logout = logout;
+
 document.addEventListener('click', (event) => {
   const menu = document.querySelector('.account-menu-container');
   if (menu && !menu.contains(event.target)) {
@@ -186,4 +188,11 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
-loadAccountNavigation();
+const pagesWithoutStorefrontNavigation = new Set([
+  '/admin.html',
+  '/admin-login.html',
+  '/staff.html',
+]);
+if (!pagesWithoutStorefrontNavigation.has(window.location.pathname)) {
+  loadAccountNavigation();
+}

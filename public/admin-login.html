@@ -3,24 +3,16 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Staff login | Motor Apparel Shop</title>
+    <title>Jmotor Staff Portal</title>
     <link rel="stylesheet" href="/css/style.css">
-    <script src="/js/nav.js" defer></script>
     <script src="/js/admin-login.js" defer></script>
   </head>
-  <body>
-    <header class="topbar">
-      <a class="brand" href="/index.html">Jmotor Apparel</a>
-      <nav id="account-links" class="account-links" aria-label="Account"></nav>
-    </header>
-
-    <main class="auth-page">
-      <section class="auth-card" aria-labelledby="admin-login-title">
-        <p class="eyebrow">Store operations</p>
-        <h1 id="admin-login-title">Staff login</h1>
-        <p class="auth-intro">Sign in to your Jmotor staff account.</p>
-
-        <form id="admin-login-form">
+  <body class="portal-login-body">
+    <main class="portal-login-page">
+      <section class="portal-login-card" aria-labelledby="admin-login-title">
+        <p class="portal-login-brand">Jmotor Apparel</p>
+        <h1 id="admin-login-title">Jmotor Staff Portal</h1>
+        <form id="admin-login-form" class="portal-login-form">
           <label for="admin-login-username">Username</label>
           <input id="admin-login-username" name="username" type="text"
                  autocomplete="username" required>
@@ -30,35 +22,9 @@
                  autocomplete="current-password" required>
 
           <p id="admin-login-message" class="form-message" role="status" aria-live="polite"></p>
-          <button id="admin-login-submit" class="add-button" type="submit">Login</button>
+          <button id="admin-login-submit" class="add-button" type="submit">Sign in</button>
         </form>
       </section>
     </main>
-    <footer class="site-footer footer">
-      <div class="footer-columns">
-        <section>
-          <h2>Customer Service</h2>
-          <a class="footer-placeholder" href="#">FAQ</a>
-          <a class="footer-placeholder" href="#">Payment Methods</a>
-          <a class="footer-placeholder" href="#">Delivery</a>
-          <a class="footer-placeholder" href="#">Return Policy</a>
-          <a href="/orders.html">Track your order</a>
-        </section>
-        <section>
-          <h2>About Jmotor</h2>
-          <a class="footer-placeholder" href="#">About Us</a>
-          <a class="footer-placeholder" href="#">Join Us</a>
-          <a class="footer-placeholder" href="#">Privacy Policy</a>
-          <a class="footer-placeholder" href="#">Terms and Conditions</a>
-        </section>
-        <section>
-          <h2>Contacts</h2>
-          <p>Email: demo@jmotor.example</p>
-          <p>Phone: 0900 000 0000</p>
-          <p class="footer-note">(demo placeholders)</p>
-        </section>
-      </div>
-      <p class="footer-bottom">Jmotor Apparel - school project demo</p>
-    </footer>
   </body>
 </html>

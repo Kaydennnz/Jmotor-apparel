@@ -7,8 +7,19 @@ const productDialog = document.getElementById('product-dialog');
 const productForm = document.getElementById('product-form');
 const variantDialog = document.getElementById('variant-dialog');
 const variantForm = document.getElementById('variant-form');
+const staffForm = document.getElementById('staff-form');
+
+const orderStatuses = ['pending', 'confirmed', 'packed', 'shipped', 'delivered', 'cancelled'];
+const sectionTitles = {
+  dashboard: 'Dashboard',
+  products: 'Products',
+  staff: 'Staff',
+};
+const sidebarPreferenceKey = 'jmotor-admin-sidebar-open';
 
 let categories = [];
+let categoriesLoaded = false;
+let products = [];
 let editingProductId = null;
 let editingVariantId = null;
 let variantProductId = null;
@@ -19,8 +30,7 @@ function setMessage(message) {
 
 function formatPrice(amount) {
   return `₱${Number(amount).toLocaleString('en-PH', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    maximumFractionDigits: 0,
   })}`;
 }
 
@@ -29,7 +39,7 @@ async function requestJson(url, options) {
   const result = await response.json();
   if (!response.ok) {
     if (response.status === 401) {
-      window.location.assign('/login.html');
+      window.location.assign('/admin-login.html');
     }
     throw new Error(result.error || result.message || 'The request could not be completed.');
   }
@@ -45,10 +55,11 @@ function jsonOptions(method, body) {
 }
 
 async function initializeAdminPage() {
+  initializeSidebar();
   try {
     const response = await fetch('/api/auth/me');
     if (response.status === 401) {
-      window.location.assign('/login.html');
+      window.location.assign('/admin-login.html');
       return;
     }
     const user = await response.json();
@@ -61,12 +72,28 @@ async function initializeAdminPage() {
     }
 
     adminApp.hidden = false;
-    categories = await requestJson('/api/categories');
-    populateCategoryOptions();
-    await loadProducts();
+    await selectSection(getSectionFromHash());
   } catch (error) {
     setMessage(error.message);
   }
+}
+
+function getSectionFromHash() {
+  const section = window.location.hash.slice(1).toLowerCase();
+  if (Object.prototype.hasOwnProperty.call(sectionTitles, section)) {
+    return section;
+  }
+  window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#dashboard`);
+  return 'dashboard';
+}
+
+async function ensureCategories() {
+  if (categoriesLoaded) {
+    return;
+  }
+  categories = await requestJson('/api/categories');
+  categoriesLoaded = true;
+  populateCategoryOptions();
 }
 
 function populateCategoryOptions() {
@@ -83,12 +110,17 @@ function populateCategoryOptions() {
     option.value = String(category.id);
     option.textContent = category.name;
     select.append(option);
+
+    const filterOption = document.createElement('option');
+    filterOption.value = String(category.id);
+    filterOption.textContent = category.name;
+    document.getElementById('product-category-filter').append(filterOption);
   });
 }
 
 async function loadProducts() {
-  const products = await requestJson('/api/admin/products');
-  renderProducts(products);
+  products = await requestJson('/api/admin/products');
+  applyProductFilters();
 }
 
 function createTextElement(tag, className, text) {
@@ -100,58 +132,128 @@ function createTextElement(tag, className, text) {
   return element;
 }
 
+function createTable(headers, className) {
+  const table = document.createElement('table');
+  table.className = className;
+  const thead = document.createElement('thead');
+  const headingRow = document.createElement('tr');
+  headers.forEach((label) => headingRow.append(createTextElement('th', '', label)));
+  thead.append(headingRow);
+  table.append(thead, document.createElement('tbody'));
+  return table;
+}
+
 function renderProducts(products) {
   adminProducts.replaceChildren();
   if (products.length === 0) {
-    adminProducts.append(createTextElement('p', 'admin-empty', 'No products found.'));
+    adminProducts.append(createTextElement('p', 'admin-empty portal-empty', 'No products found'));
     return;
   }
-  products.forEach((product) => adminProducts.append(createProductCard(product)));
+
+  const table = createTable(
+    ['Product', 'Category', 'Price range', 'Total stock', 'Status', 'Actions'],
+    'portal-data-table portal-products-table'
+  );
+  const tbody = table.tBodies[0];
+  products.forEach((product) => {
+    const { productRow, variantsRow } = createProductRows(product);
+    tbody.append(productRow, variantsRow);
+  });
+  adminProducts.append(table);
 }
 
-function createProductCard(product) {
-  const card = document.createElement('article');
-  card.className = 'admin-card admin-product-card';
-  const heading = document.createElement('div');
-  heading.className = 'admin-product-heading';
-  const title = document.createElement('div');
-  title.append(
-    createTextElement('h3', '', product.name),
-    createTextElement('p', 'admin-muted', `${product.category.name} · ${product.active ? 'Active' : 'Inactive'}`)
-  );
-  const actions = document.createElement('div');
-  actions.className = 'admin-card-actions';
-  actions.append(
-    createButton('Edit', () => openProductDialog(product)),
-    createButton('Add variant', () => openVariantDialog(product.id))
-  );
-  heading.append(title, actions);
-  card.append(heading);
+function createProductRows(product) {
+  const row = document.createElement('tr');
+  const nameCell = document.createElement('td');
+  nameCell.className = 'portal-product-name-cell';
+  const nameButton = createButton(product.name, () => {
+    variantsRow.hidden = !variantsRow.hidden;
+    nameButton.setAttribute('aria-expanded', String(!variantsRow.hidden));
+    chevron.textContent = variantsRow.hidden ? '›' : '⌄';
+    chevron.setAttribute('aria-expanded', String(!variantsRow.hidden));
+  }, 'portal-product-toggle');
+  nameButton.setAttribute('aria-expanded', 'false');
+  const chevron = createButton('›', () => nameButton.click(), 'portal-chevron-button');
+  chevron.setAttribute('aria-label', `Show variants for ${product.name}`);
+  chevron.setAttribute('aria-expanded', 'false');
+  nameCell.append(chevron, nameButton);
 
-  if (product.description) {
-    card.append(createTextElement('p', 'admin-description', product.description));
-  }
-  const variantsHeading = createTextElement('h4', 'admin-subheading', 'Variants');
-  card.append(variantsHeading);
+  const prices = product.variants.map((variant) => Number(variant.price));
+  const priceRange = prices.length
+    ? prices.length === 1
+      ? formatPrice(prices[0])
+      : `${formatPrice(Math.min(...prices))} – ${formatPrice(Math.max(...prices))}`
+    : '—';
+  const totalStock = product.variants.reduce((total, variant) => total + Number(variant.stock), 0);
+  const statusCell = document.createElement('td');
+  statusCell.append(createStatusBadge(product.active ? 'Active' : 'Inactive', product.active ? 'active' : 'inactive'));
+  row.append(
+    nameCell,
+    createTextElement('td', '', product.category.name),
+    createTextElement('td', '', priceRange),
+    createTextElement('td', '', String(totalStock)),
+    statusCell,
+    createActionCell([
+      createButton('Edit', () => openProductDialog(product)),
+      createButton('Add variant', () => openVariantDialog(product.id)),
+    ])
+  );
+
+  const variantsRow = document.createElement('tr');
+  variantsRow.className = 'portal-product-variants-row';
+  variantsRow.hidden = true;
+  const variantsCell = document.createElement('td');
+  variantsCell.colSpan = 6;
+  variantsCell.append(createVariantsTable(product));
+  variantsRow.append(variantsCell);
+  return { productRow: row, variantsRow };
+}
+
+function createVariantsTable(product) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'portal-variants-wrap';
   if (product.variants.length === 0) {
-    card.append(createTextElement('p', 'admin-muted', 'No variants.'));
-  } else {
-    const list = document.createElement('div');
-    list.className = 'admin-variant-list';
-    product.variants.forEach((variant) => {
-      const row = document.createElement('div');
-      row.className = 'admin-variant-item';
-      const description = createTextElement(
-        'p',
-        '',
-        `#${variant.id} · ${variant.size || 'Default size'} · ${variant.color || 'Default color'} · ${formatPrice(variant.price)} · Stock ${variant.stock}`
-      );
-      row.append(description, createButton('Edit variant', () => openVariantDialog(product.id, variant)));
-      list.append(row);
-    });
-    card.append(list);
+    wrapper.append(createTextElement('p', 'admin-empty portal-empty', 'No variants.'));
+    return wrapper;
   }
-  return card;
+
+  const table = createTable(
+    ['ID', 'Size', 'Color', 'Price', 'Stock', ''],
+    'portal-data-table portal-variants-table'
+  );
+  const tbody = table.tBodies[0];
+  product.variants.forEach((variant) => {
+    const row = document.createElement('tr');
+    row.append(
+      createTextElement('td', '', `#${variant.id}`),
+      createTextElement('td', '', variant.size || 'Default size'),
+      createTextElement('td', '', variant.color || 'Default color'),
+      createTextElement('td', '', formatPrice(variant.price)),
+      createTextElement('td', '', String(variant.stock)),
+      createActionCell([
+        createButton('Edit variant', () => openVariantDialog(product.id, variant)),
+      ])
+    );
+    tbody.append(row);
+  });
+  wrapper.append(table);
+  return wrapper;
+}
+
+function createActionCell(buttons) {
+  const cell = document.createElement('td');
+  cell.className = 'portal-actions-cell';
+  const actions = document.createElement('div');
+  actions.className = 'portal-action-buttons';
+  buttons.forEach((button) => actions.append(button));
+  cell.append(actions);
+  return cell;
+}
+
+function createStatusBadge(label, status) {
+  const badge = createTextElement('span', 'portal-badge', label);
+  badge.classList.add(`portal-badge--${status}`);
+  return badge;
 }
 
 function createButton(label, action, className = 'admin-small-button') {
@@ -217,8 +319,10 @@ function addVariantRow(variant = {}) {
     row.append(wrapper);
   });
 
-  const remove = createButton('Remove row', () => row.remove(), 'admin-remove-button');
-  remove.hidden = document.querySelectorAll('.admin-variant-row').length === 0;
+  const remove = createButton('Remove row', () => {
+    row.remove();
+    updateVariantRowRemoveButtons();
+  }, 'admin-remove-button');
   row.append(remove);
   document.getElementById('new-variant-rows').append(row);
   updateVariantRowRemoveButtons();
@@ -232,13 +336,11 @@ function updateVariantRowRemoveButtons() {
 }
 
 function readVariantRow(row) {
-  const price = row.querySelector('[name="price"]').valueAsNumber;
-  const stock = row.querySelector('[name="stock"]').valueAsNumber;
   return {
     size: row.querySelector('[name="size"]').value || null,
     color: row.querySelector('[name="color"]').value || null,
-    price,
-    stock,
+    price: row.querySelector('[name="price"]').valueAsNumber,
+    stock: row.querySelector('[name="stock"]').valueAsNumber,
   };
 }
 
@@ -373,22 +475,24 @@ async function loadStaff() {
   const staff = await requestJson('/api/admin/staff');
   adminStaffList.replaceChildren();
   if (staff.length === 0) {
-    adminStaffList.append(createTextElement('p', 'admin-empty', 'No staff accounts.'));
+    adminStaffList.append(createTextElement('p', 'admin-empty portal-empty', 'No staff accounts.'));
     return;
   }
-  const list = document.createElement('div');
-  list.className = 'admin-staff-table';
+
+  const table = createTable(['Display name', 'Username', 'Role'], 'portal-data-table portal-staff-table');
+  const tbody = table.tBodies[0];
   staff.forEach((user) => {
-    const row = document.createElement('div');
-    row.className = 'admin-staff-row';
+    const row = document.createElement('tr');
+    const roleCell = document.createElement('td');
+    roleCell.append(createStatusBadge(user.role, user.role === 'admin' ? 'active' : 'staff'));
     row.append(
-      createTextElement('strong', '', user.displayName),
-      createTextElement('span', '', user.username),
-      createTextElement('span', 'admin-role', user.role)
+      createTextElement('td', '', user.displayName),
+      createTextElement('td', '', user.username),
+      roleCell
     );
-    list.append(row);
+    tbody.append(row);
   });
-  adminStaffList.append(list);
+  adminStaffList.append(table);
 }
 
 async function createStaff(event) {
@@ -413,62 +517,165 @@ async function createStaff(event) {
   }
 }
 
-async function loadReports() {
-  const report = await requestJson('/api/admin/reports');
-  adminReports.replaceChildren();
-  const salesCard = document.createElement('section');
-  salesCard.className = 'admin-card admin-sales-card';
-  salesCard.append(
-    createTextElement('h2', '', 'Total sales'),
-    createTextElement('p', 'admin-sales-total', formatPrice(report.totalSales))
-  );
-
-  const grid = document.createElement('div');
-  grid.className = 'admin-report-grid';
-  const countsCard = document.createElement('section');
-  countsCard.className = 'admin-card';
-  countsCard.append(createTextElement('h2', '', 'Orders by status'));
-  const counts = document.createElement('dl');
-  counts.className = 'admin-count-list';
-  report.orderCounts.forEach((entry) => {
-    counts.append(
-      createTextElement('dt', '', entry.status),
-      createTextElement('dd', '', String(entry.count))
-    );
-  });
-  countsCard.append(counts);
-
-  const stockCard = document.createElement('section');
-  stockCard.className = 'admin-card';
-  stockCard.append(createTextElement('h2', '', 'Low-stock variants'));
-  if (report.lowStockVariants.length === 0) {
-    stockCard.append(createTextElement('p', 'admin-empty', 'No variants have stock below 5.'));
-  } else {
-    const list = document.createElement('div');
-    list.className = 'admin-low-stock-list';
-    report.lowStockVariants.forEach((variant) => {
-      list.append(createTextElement(
-        'p',
-        '',
-        `#${variant.id} · ${variant.productName} · ${variant.size || 'Default size'} · ${variant.color || 'Default color'} · Stock ${variant.stock}`
-      ));
-    });
-    stockCard.append(list);
-  }
-
-  grid.append(countsCard, stockCard);
-  adminReports.append(salesCard, grid);
+async function loadDashboard() {
+  const [report, orders] = await Promise.all([
+    requestJson('/api/admin/reports'),
+    requestJson('/api/staff/orders'),
+  ]);
+  renderDashboard(report, orders);
 }
 
-async function loadTab(tabName) {
-  setMessage(`Loading ${tabName}...`);
-  try {
-    if (tabName === 'Products') {
-      await loadProducts();
-    } else if (tabName === 'Staff') {
-      await loadStaff();
+function renderDashboard(report, orders) {
+  adminReports.replaceChildren();
+  const counts = new Map(report.orderCounts.map((entry) => [entry.status, Number(entry.count)]));
+  const totalOrders = Array.from(counts.values()).reduce((sum, count) => sum + count, 0);
+  const stats = document.createElement('div');
+  stats.className = 'portal-stat-grid';
+  [
+    ['Total sales', formatPrice(report.totalSales), 'Delivered orders'],
+    ['Pending orders', String(counts.get('pending') || 0), 'Awaiting action'],
+    ['Total orders', String(totalOrders), 'All order statuses'],
+    ['Low-stock items', String(report.lowStockVariants.length), 'Variants under 5'],
+  ].forEach(([label, value, note]) => {
+    const card = document.createElement('article');
+    card.className = 'portal-stat-card';
+    card.append(
+      createTextElement('p', 'portal-stat-label', label),
+      createTextElement('p', 'portal-stat-value', value),
+      createTextElement('p', 'portal-stat-note', note)
+    );
+    stats.append(card);
+  });
+  adminReports.append(stats);
+
+  const columns = document.createElement('div');
+  columns.className = 'portal-dashboard-grid';
+  columns.append(createOrderChart(report.orderCounts), createLowStockPanel(report.lowStockVariants));
+  adminReports.append(columns, createRecentOrdersPanel(orders));
+}
+
+function createOrderChart(orderCounts) {
+  const card = document.createElement('section');
+  card.className = 'portal-card';
+  card.append(createTextElement('h2', 'portal-card-title', 'Orders by status'));
+
+  const chart = document.createElement('div');
+  chart.className = 'portal-status-chart';
+  const maximum = Math.max(1, ...orderCounts.map((entry) => Number(entry.count)));
+  orderCounts.forEach(({ status, count }) => {
+    const row = document.createElement('div');
+    row.className = 'portal-chart-row';
+    const label = createStatusBadge(status, status);
+    const track = document.createElement('div');
+    track.className = 'portal-chart-track';
+    const bar = document.createElement('div');
+    bar.className = 'portal-chart-bar';
+    bar.classList.add(`portal-chart-bar--${orderStatuses.includes(status) ? status : 'pending'}`);
+    bar.style.width = `${Math.max(0, Number(count) / maximum * 100)}%`;
+    track.append(bar);
+    row.append(label, track, createTextElement('strong', 'portal-chart-count', String(count)));
+    chart.append(row);
+  });
+  card.append(chart);
+  return card;
+}
+
+function createLowStockPanel(variants) {
+  const card = document.createElement('section');
+  card.className = 'portal-card';
+  card.append(createTextElement('h2', 'portal-card-title', 'Low stock'));
+  if (variants.length === 0) {
+    card.append(createTextElement('p', 'admin-empty portal-empty', 'No variants have stock under 5.'));
+    return card;
+  }
+
+  const list = document.createElement('ul');
+  list.className = 'portal-low-stock-list';
+  variants.forEach((variant) => {
+    const item = document.createElement('li');
+    const details = createTextElement(
+      'span',
+      'portal-low-stock-details',
+      `${variant.size || 'Default size'} · ${variant.color || 'Default color'}`
+    );
+    item.append(
+      createTextElement('strong', '', variant.productName),
+      details,
+      createTextElement('span', 'portal-stock-count', String(variant.stock))
+    );
+    list.append(item);
+  });
+  card.append(list);
+  return card;
+}
+
+function createRecentOrdersPanel(orders) {
+  const card = document.createElement('section');
+  card.className = 'portal-card portal-recent-orders';
+  const heading = document.createElement('div');
+  heading.className = 'portal-card-heading';
+  heading.append(
+    createTextElement('h2', 'portal-card-title', 'Recent orders'),
+    createTextElement('a', 'portal-text-link', 'View all orders')
+  );
+  heading.lastElementChild.href = '/staff.html';
+  card.append(heading);
+
+  const scroll = document.createElement('div');
+  scroll.className = 'portal-table-scroll';
+  const table = createTable(['Order', 'Customer', 'Status', 'Total'], 'portal-data-table');
+  const tbody = table.tBodies[0];
+  const recentOrders = orders.slice(0, 5);
+  if (recentOrders.length === 0) {
+    const row = document.createElement('tr');
+    const cell = createTextElement('td', 'portal-empty', 'No orders found.');
+    cell.colSpan = 4;
+    row.append(cell);
+    tbody.append(row);
+  } else {
+    recentOrders.forEach((order) => {
+      const row = document.createElement('tr');
+      const status = orderStatuses.includes(order.status) ? order.status : 'pending';
+      const statusCell = document.createElement('td');
+      statusCell.append(createStatusBadge(order.status, status));
+      row.append(
+        createTextElement('td', '', `#${order.id}`),
+        createTextElement('td', '', order.customerName || '—'),
+        statusCell,
+        createTextElement('td', '', formatPrice(order.total))
+      );
+      tbody.append(row);
+    });
+  }
+  scroll.append(table);
+  card.append(scroll);
+  return card;
+}
+
+async function selectSection(section) {
+  document.querySelectorAll('.portal-section').forEach((panel) => {
+    panel.hidden = panel.dataset.section !== section;
+  });
+  document.querySelectorAll('.portal-nav-item[href^="#"]').forEach((link) => {
+    const active = link.hash === `#${section}`;
+    link.classList.toggle('is-active', active);
+    if (active) {
+      link.setAttribute('aria-current', 'page');
     } else {
-      await loadReports();
+      link.removeAttribute('aria-current');
+    }
+  });
+  document.getElementById('portal-heading').textContent = sectionTitles[section];
+  setMessage(`Loading ${sectionTitles[section].toLowerCase()}...`);
+
+  try {
+    if (section === 'dashboard') {
+      await loadDashboard();
+    } else if (section === 'products') {
+      await ensureCategories();
+      await loadProducts();
+    } else if (section === 'staff') {
+      await loadStaff();
     }
     setMessage('');
   } catch (error) {
@@ -476,25 +683,83 @@ async function loadTab(tabName) {
   }
 }
 
-function selectTab(tabName) {
-  ['Products', 'Staff', 'Reports'].forEach((name) => {
-    const key = name.toLowerCase();
-    const selected = name === tabName;
-    document.getElementById(`tab-${key}`).classList.toggle('is-active', selected);
-    document.getElementById(`tab-${key}`).setAttribute('aria-selected', String(selected));
-    document.getElementById(`panel-${key}`).hidden = !selected;
+function initializeSidebar() {
+  const layout = document.querySelector('.portal-layout');
+  const sidebarToggle = document.querySelector('.portal-sidebar-toggle');
+  const contentToggle = document.querySelector('.portal-content-toggle');
+  let isOpen = window.matchMedia('(min-width: 801px)').matches;
+  try {
+    const savedPreference = window.localStorage.getItem(sidebarPreferenceKey);
+    if (savedPreference !== null) {
+      isOpen = savedPreference === 'true';
+    }
+  } catch (error) {
+    // Keep the viewport-based default if storage is unavailable.
+  }
+  setSidebarOpen(layout, sidebarToggle, contentToggle, isOpen);
+
+  [sidebarToggle, contentToggle].forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      const nextIsOpen = layout.classList.contains('is-sidebar-hidden');
+      setSidebarOpen(layout, sidebarToggle, contentToggle, nextIsOpen);
+      try {
+        window.localStorage.setItem(sidebarPreferenceKey, String(nextIsOpen));
+      } catch (error) {
+        // The control remains usable when storage is unavailable.
+      }
+    });
   });
-  loadTab(tabName);
 }
 
-const staffForm = document.getElementById('staff-form');
+function setSidebarOpen(layout, sidebarToggle, contentToggle, isOpen) {
+  layout.classList.toggle('is-sidebar-hidden', !isOpen);
+  sidebarToggle.setAttribute('aria-expanded', String(isOpen));
+  contentToggle.setAttribute('aria-expanded', String(isOpen));
+  contentToggle.hidden = isOpen;
+}
 
-document.querySelectorAll('.admin-tab').forEach((button) => {
-  button.addEventListener('click', () => {
-    selectTab(button.textContent);
+function applyProductFilters() {
+  const search = document.getElementById('product-search').value.trim().toLocaleLowerCase();
+  const categoryId = document.getElementById('product-category-filter').value;
+  const status = document.getElementById('product-status-filter').value;
+  const filteredProducts = products.filter((product) => {
+    const matchesSearch = product.name.toLocaleLowerCase().includes(search);
+    const matchesCategory = !categoryId || String(product.category.id) === categoryId;
+    const matchesStatus = !status || (product.active ? 'active' : 'inactive') === status;
+    return matchesSearch && matchesCategory && matchesStatus;
+  });
+  renderProducts(filteredProducts);
+}
+
+document.getElementById('product-search').addEventListener('input', applyProductFilters);
+document.getElementById('product-category-filter').addEventListener('change', applyProductFilters);
+document.getElementById('product-status-filter').addEventListener('change', applyProductFilters);
+
+document.querySelectorAll('.portal-nav-item[href^="#"]').forEach((link) => {
+  link.addEventListener('click', (event) => {
+    event.preventDefault();
+    if (link.hash !== window.location.hash) {
+      window.location.hash = link.hash;
+    } else {
+      selectSection(link.hash.slice(1));
+    }
   });
 });
-document.getElementById('add-product-button').addEventListener('click', () => openProductDialog());
+window.addEventListener('hashchange', () => {
+  selectSection(getSectionFromHash());
+});
+
+document.querySelector('[data-portal-logout]').addEventListener('click', (event) => {
+  window.logout(event);
+});
+document.getElementById('add-product-button').addEventListener('click', async () => {
+  try {
+    await ensureCategories();
+    openProductDialog();
+  } catch (error) {
+    setMessage(error.message);
+  }
+});
 document.getElementById('add-variant-row').addEventListener('click', () => addVariantRow());
 document.querySelectorAll('[data-close-dialog]').forEach((button) => {
   button.addEventListener('click', () => button.closest('dialog').close());

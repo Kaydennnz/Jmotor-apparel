@@ -3,59 +3,107 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin | Motor Apparel Shop</title>
+    <title>Admin | Jmotor Apparel</title>
     <link rel="stylesheet" href="/css/style.css">
     <script src="/js/nav.js" defer></script>
     <script src="/js/admin.js" defer></script>
   </head>
-  <body>
-    <header class="topbar">
-      <a class="brand" href="/index.html">Jmotor Apparel</a>
-      <nav id="account-links" class="account-links" aria-label="Account"></nav>
-    </header>
-
-    <main class="admin-page">
-      <div class="order-page-heading">
-        <p class="eyebrow">Store management</p>
-        <h1>Admin</h1>
-        <a href="/staff.html">View orders</a>
-      </div>
-      <p id="admin-message" class="page-message" role="status" aria-live="polite"></p>
-      <div id="admin-app" hidden>
-        <div class="admin-tabs" role="tablist" aria-label="Admin sections">
-          <button id="tab-products" class="admin-tab is-active" type="button"
-                  role="tab" aria-selected="true" aria-controls="panel-products">Products</button>
-          <button id="tab-staff" class="admin-tab" type="button"
-                  role="tab" aria-selected="false" aria-controls="panel-staff">Staff</button>
-          <button id="tab-reports" class="admin-tab" type="button"
-                  role="tab" aria-selected="false" aria-controls="panel-reports">Reports</button>
+  <body class="admin-portal-body">
+    <div class="portal-layout">
+      <aside class="portal-sidebar">
+        <div class="portal-sidebar-heading">
+          <a class="portal-brand" href="/admin.html#dashboard">Jmotor Apparel</a>
+          <span class="portal-brand-label">Admin</span>
+          <button class="portal-menu-toggle portal-sidebar-toggle" type="button"
+                  aria-label="Toggle menu" aria-expanded="true" aria-controls="portal-navigation">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+          </button>
         </div>
+        <nav id="portal-navigation" class="portal-navigation" aria-label="Admin">
+          <a id="tab-reports" class="portal-nav-item" href="#dashboard"
+             aria-controls="panel-reports">Dashboard</a>
+          <a class="portal-nav-item" href="/staff.html">Orders</a>
+          <a id="tab-products" class="portal-nav-item" href="#products"
+             aria-controls="panel-products">Products</a>
+          <a id="tab-staff" class="portal-nav-item" href="#staff"
+             aria-controls="panel-staff">Staff</a>
+          <button class="portal-logout" type="button" data-portal-logout>Logout</button>
+        </nav>
+      </aside>
 
-        <section id="panel-products" class="admin-panel" role="tabpanel"
-                 aria-labelledby="tab-products">
-          <div class="admin-panel-heading">
-            <h2>Products</h2>
-            <button id="add-product-button" class="add-button admin-action-button" type="button">
-              Add product
-            </button>
+      <main class="portal-main">
+        <button class="portal-menu-toggle portal-content-toggle" type="button" aria-label="Toggle menu"
+                aria-expanded="false" aria-controls="portal-navigation" hidden>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </button>
+        <header class="portal-page-heading">
+          <div>
+            <p class="portal-kicker">Store management</p>
+            <h1 id="portal-heading">Dashboard</h1>
           </div>
-          <div id="admin-products" class="admin-product-list"></div>
-        </section>
-
-        <section id="panel-staff" class="admin-panel" role="tabpanel"
-                 aria-labelledby="tab-staff" hidden>
-          <section class="admin-card">
-            <h2>Staff accounts</h2>
-            <div id="admin-staff-list" class="admin-staff-list"></div>
+          <a class="portal-orders-link" href="/staff.html">View orders</a>
+        </header>
+        <p id="admin-message" class="page-message portal-message" role="status" aria-live="polite"></p>
+        <div id="admin-app" class="portal-content" hidden>
+          <section id="panel-reports" class="portal-section" data-section="dashboard"
+                   aria-labelledby="tab-reports" hidden>
+            <div id="admin-reports"></div>
           </section>
-          <section class="admin-card">
-            <h2>Create staff account</h2>
-            <form id="staff-form" class="admin-form">
-              <div class="admin-form-grid">
-                <div>
-                  <label for="staff-name">Display name</label>
-                  <input id="staff-name" name="displayName" type="text" maxlength="100" required>
-                </div>
+
+          <section id="panel-products" class="portal-section" data-section="products"
+                   aria-labelledby="tab-products" hidden>
+            <div class="portal-section-heading">
+              <div>
+                <p class="portal-kicker">Catalog</p>
+                <h2>Products</h2>
+              </div>
+              <button id="add-product-button" class="add-button admin-action-button portal-add-product-button" type="button">
+                Add product
+              </button>
+            </div>
+            <div class="portal-product-filters" role="search" aria-label="Filter products">
+              <label>
+                <span>Search products</span>
+                <input id="product-search" type="search" autocomplete="off"
+                       placeholder="Search by product name">
+              </label>
+              <label>
+                <span>Category</span>
+                <select id="product-category-filter">
+                  <option value="">All categories</option>
+                </select>
+              </label>
+              <label>
+                <span>Status</span>
+                <select id="product-status-filter">
+                  <option value="">All</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </label>
+            </div>
+            <div id="admin-products" class="portal-table-scroll admin-products-table-wrap"></div>
+          </section>
+
+          <section id="panel-staff" class="portal-section" data-section="staff"
+                   aria-labelledby="tab-staff" hidden>
+            <div class="portal-section-heading">
+              <div>
+                <p class="portal-kicker">Team access</p>
+                <h2>Staff</h2>
+              </div>
+            </div>
+            <section class="admin-card portal-card">
+              <h3>Staff accounts</h3>
+              <div id="admin-staff-list" class="portal-table-scroll"></div>
+            </section>
+            <section class="admin-card portal-card">
+              <h3>Create staff account</h3>
+              <form id="staff-form" class="admin-form portal-staff-form">
                 <div>
                   <label for="staff-username">Username</label>
                   <input id="staff-username" name="username" type="text"
@@ -63,22 +111,21 @@
                          autocomplete="username" required>
                 </div>
                 <div>
+                  <label for="staff-name">Display name</label>
+                  <input id="staff-name" name="displayName" type="text" maxlength="100" required>
+                </div>
+                <div>
                   <label for="staff-password">Password</label>
                   <input id="staff-password" name="password" type="password"
                          minlength="8" autocomplete="new-password" required>
                 </div>
-              </div>
-              <button class="add-button admin-action-button" type="submit">Create staff</button>
-            </form>
+                <button class="add-button admin-action-button" type="submit">Create staff</button>
+              </form>
+            </section>
           </section>
-        </section>
-
-        <section id="panel-reports" class="admin-panel" role="tabpanel"
-                 aria-labelledby="tab-reports" hidden>
-          <div id="admin-reports"></div>
-        </section>
-      </div>
-    </main>
+        </div>
+      </main>
+    </div>
 
     <dialog id="product-dialog" class="admin-dialog">
       <form id="product-form" class="admin-form">
@@ -140,31 +187,5 @@
         </div>
       </form>
     </dialog>
-    <footer class="site-footer footer">
-      <div class="footer-columns">
-        <section>
-          <h2>Customer Service</h2>
-          <a class="footer-placeholder" href="#">FAQ</a>
-          <a class="footer-placeholder" href="#">Payment Methods</a>
-          <a class="footer-placeholder" href="#">Delivery</a>
-          <a class="footer-placeholder" href="#">Return Policy</a>
-          <a href="/orders.html">Track your order</a>
-        </section>
-        <section>
-          <h2>About Jmotor</h2>
-          <a class="footer-placeholder" href="#">About Us</a>
-          <a class="footer-placeholder" href="#">Join Us</a>
-          <a class="footer-placeholder" href="#">Privacy Policy</a>
-          <a class="footer-placeholder" href="#">Terms and Conditions</a>
-        </section>
-        <section>
-          <h2>Contacts</h2>
-          <p>Email: demo@jmotor.example</p>
-          <p>Phone: 0900 000 0000</p>
-          <p class="footer-note">(demo placeholders)</p>
-        </section>
-      </div>
-      <p class="footer-bottom">Jmotor Apparel - school project demo</p>
-    </footer>
   </body>
 </html>
