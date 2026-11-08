@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Staff login | Motor Apparel Shop</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/admin-login.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">Jmotor <span>Apparel</span></a>
+    </header>
+
+    <main class="auth-page">
+      <section class="auth-card" aria-labelledby="admin-login-title">
+        <p class="eyebrow">Store operations</p>
+        <h1 id="admin-login-title">Staff login</h1>
+        <p class="auth-intro">Sign in to your Jmotor staff account.</p>
+
+        <form id="admin-login-form">
+          <label for="admin-login-username">Username</label>
+          <input id="admin-login-username" name="username" type="text"
+                 autocomplete="username" required>
+
+          <label for="admin-login-password">Password</label>
+          <input id="admin-login-password" name="password" type="password"
+                 autocomplete="current-password" required>
+
+          <p id="admin-login-message" class="form-message" role="status" aria-live="polite"></p>
+          <button id="admin-login-submit" class="add-button" type="submit">Login</button>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

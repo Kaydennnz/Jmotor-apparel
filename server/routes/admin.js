@@ -13,7 +13,7 @@ const orderStatuses = [
   'delivered',
   'cancelled',
 ];
-const phonePattern = /^09\d{9}$/;
+const usernamePattern = /^[A-Za-z0-9_]{3,50}$/;
 
 function isObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -324,9 +324,9 @@ async function updateVariant(req, res) {
 async function createStaff(req, res) {
   const body = req.body;
   if (!isObject(body)
-      || typeof body.phone !== 'string'
-      || !phonePattern.test(body.phone)) {
-    return res.status(400).json({ error: 'Enter a valid Philippine mobile number' });
+      || typeof body.username !== 'string'
+      || !usernamePattern.test(body.username)) {
+    return res.status(400).json({ error: 'Username must be 3-50 characters and contain only letters, digits, or underscores' });
   }
   if (typeof body.password !== 'string' || body.password.length < 8) {
     return res.status(400).json({ error: 'Password must be at least 8 characters' });
@@ -340,19 +340,19 @@ async function createStaff(req, res) {
   const passwordHash = await bcrypt.hash(body.password, 10);
   try {
     const [result] = await pool.execute(
-      `INSERT INTO users (phone, password_hash, display_name, role, phone_verified)
-       VALUES (?, ?, ?, ?, ?)`,
-      [body.phone, passwordHash, body.displayName.trim(), 'staff', 1]
+      `INSERT INTO users (username, password_hash, display_name, role)
+       VALUES (?, ?, ?, ?)`,
+      [body.username, passwordHash, body.displayName.trim(), 'staff']
     );
     res.status(201).json({
       id: Number(result.insertId),
-      phone: body.phone,
+      username: body.username,
       displayName: body.displayName.trim(),
       role: 'staff',
     });
   } catch (error) {
     if (isDuplicateEntry(error)) {
-      return res.status(409).json({ error: 'Phone number is already registered' });
+      return res.status(409).json({ error: 'Username is already taken' });
     }
     throw error;
   }
@@ -360,7 +360,7 @@ async function createStaff(req, res) {
 
 async function getStaff(req, res) {
   const [staff] = await pool.execute(
-    `SELECT id, display_name AS displayName, phone, role
+    `SELECT id, display_name AS displayName, username, role
      FROM users
      WHERE role = ?
      ORDER BY display_name, id`,

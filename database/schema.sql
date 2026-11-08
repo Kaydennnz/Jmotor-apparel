@@ -5,6 +5,7 @@ USE motorshop;
 -- User accounts for customers and store staff.
 CREATE TABLE users (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    username VARCHAR(50) NULL,
     phone VARCHAR(20) NULL,
     email VARCHAR(255) NULL,
     google_id VARCHAR(255) NULL,
@@ -16,10 +17,14 @@ CREATE TABLE users (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
+    UNIQUE KEY uq_users_username (username),
     UNIQUE KEY uq_users_phone (phone),
     UNIQUE KEY uq_users_email (email),
     UNIQUE KEY uq_users_google_id (google_id),
-    CONSTRAINT chk_users_phone_or_email CHECK (phone IS NOT NULL OR email IS NOT NULL)
+    CONSTRAINT chk_users_phone_or_email CHECK (
+        (role = 'customer' AND phone IS NOT NULL)
+        OR (role <> 'customer' AND (phone IS NOT NULL OR email IS NOT NULL OR username IS NOT NULL))
+    )
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- One-time verification codes are associated with phone numbers, not accounts.

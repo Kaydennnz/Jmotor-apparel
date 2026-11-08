@@ -383,7 +383,7 @@ async function loadStaff() {
     row.className = 'admin-staff-row';
     row.append(
       createTextElement('strong', '', user.displayName),
-      createTextElement('span', '', user.phone),
+      createTextElement('span', '', user.username),
       createTextElement('span', 'admin-role', user.role)
     );
     list.append(row);
@@ -398,7 +398,7 @@ async function createStaff(event) {
   setMessage('');
   try {
     const body = {
-      phone: staffForm.elements.phone.value.trim(),
+      username: staffForm.elements.username.value.trim(),
       password: staffForm.elements.password.value,
       displayName: staffForm.elements.displayName.value.trim(),
     };

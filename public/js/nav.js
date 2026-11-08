@@ -76,7 +76,11 @@ async function logout() {
     if (!response.ok) {
       throw new Error('Could not log out. Please try again.');
     }
-    window.location.reload();
+    if (window.location.pathname === '/staff.html' || window.location.pathname === '/admin.html') {
+      window.location.assign('/admin-login.html');
+    } else {
+      window.location.reload();
+    }
   } catch (error) {
     if (button) {
       button.disabled = false;

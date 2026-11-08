@@ -7,6 +7,7 @@ const { requireLogin, requireRole } = require('../middleware/auth');
 const router = express.Router();
 const phonePattern = /^09\d{9}$/;
 const loginError = 'Invalid phone number or password';
+const staffLoginError = 'Invalid username or password';
 
 // Replace the current session ID to protect against session fixation.
 function regenerateSession(req) {
@@ -105,7 +106,7 @@ async function register(req, res) {
   const phone = req.session.verifiedPhone;
   const { password, displayName } = req.body;
 
-  if (!phone) {
+  if (typeof phone !== 'string' || !phonePattern.test(phone)) {
     return res.status(401).json({ error: 'Verify your phone number first' });
   }
 
@@ -160,8 +161,41 @@ async function login(req, res) {
     ? await bcrypt.compare(password, user.password_hash)
     : false;
 
-  if (!matches || !user.is_active) {
+  if (!matches || user.role !== 'customer' || !user.is_active) {
     return res.status(401).json({ error: loginError });
+  }
+
+  await regenerateSession(req);
+  req.session.userId = user.id;
+  req.session.role = user.role;
+
+  res.json({
+    id: user.id,
+    displayName: user.display_name,
+    role: user.role,
+  });
+}
+
+// Check staff credentials and replace the session ID before logging the user in.
+async function staffLogin(req, res) {
+  const { username, password } = req.body;
+  if (typeof username !== 'string' || typeof password !== 'string') {
+    return res.status(401).json({ error: staffLoginError });
+  }
+
+  const [users] = await pool.execute(
+    'SELECT id, password_hash, display_name, role, is_active FROM users WHERE username = ? LIMIT 1',
+    [username]
+  );
+
+  const user = users[0];
+  const matches = user && (user.role === 'staff' || user.role === 'admin')
+      && user.password_hash
+    ? await bcrypt.compare(password, user.password_hash)
+    : false;
+
+  if (!matches || !user.is_active) {
+    return res.status(401).json({ error: staffLoginError });
   }
 
   await regenerateSession(req);
@@ -204,6 +238,7 @@ router.post('/request-code', requestCode);
 router.post('/verify-code', verifyCode);
 router.post('/register', register);
 router.post('/login', login);
+router.post('/staff-login', staffLogin);
 router.post('/logout', requireLogin, logout);
 router.get('/me', requireLogin, getMe);
 // Confirm that the signed-in user has the administrator role.
